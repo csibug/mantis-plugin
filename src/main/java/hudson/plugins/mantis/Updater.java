@@ -84,7 +84,7 @@ final class Updater {
         MantisProjectProperty mpp = MantisProjectProperty.get(build);
         build.getActions().add(
                 new MantisBuildAction(mpp.getRegexpPattern(), issues.toArray(new MantisIssue[0])));
-
+        
         return true;
     }
 

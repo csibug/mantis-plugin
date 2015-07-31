@@ -6,6 +6,7 @@ import hudson.plugins.mantis.model.MantisCategory;
 import hudson.plugins.mantis.model.MantisIssue;
 import hudson.plugins.mantis.model.MantisNote;
 import hudson.plugins.mantis.model.MantisProject;
+import hudson.plugins.mantis.model.MantisProjectVersion;
 import hudson.plugins.mantis.model.MantisViewState;
 import hudson.plugins.mantis.soap.MantisSession;
 import hudson.plugins.mantis.soap.MantisSessionFactory;
@@ -169,6 +170,11 @@ public final class MantisSite {
 
         LOGGER.log(Level.INFO, Messages.MantisSite_SucceedInConnectingToMantis(urlString));
         return true;
+    }
+    
+    public MantisProjectVersion createProjectVersion(MantisProjectVersion version) throws MantisHandlingException {
+        final MantisSession session = createSession();
+        return session.addProjectVersion(version);
     }
 
     public MantisIssue getIssue(final int id) throws MantisHandlingException {

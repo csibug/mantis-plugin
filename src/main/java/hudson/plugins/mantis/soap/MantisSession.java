@@ -5,6 +5,9 @@ import hudson.plugins.mantis.model.MantisCategory;
 import hudson.plugins.mantis.model.MantisIssue;
 import hudson.plugins.mantis.model.MantisNote;
 import hudson.plugins.mantis.model.MantisProject;
+import hudson.plugins.mantis.model.MantisProjectVersion;
+import hudson.plugins.mantis.soap.mantis120.ProjectVersionData;
+import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -24,4 +27,10 @@ public interface MantisSession {
     List<MantisCategory> getCategories(int projectId) throws MantisHandlingException;
     
     int addIssue(MantisIssue issue) throws MantisHandlingException;
+    
+    MantisProjectVersion addProjectVersion(MantisProjectVersion version) throws MantisHandlingException;
+    
+    boolean updateProjectVersion(MantisProjectVersion version) throws MantisHandlingException;
+    
+    List<MantisProjectVersion> getProjectVersions(BigInteger projectId) throws MantisHandlingException;
 }

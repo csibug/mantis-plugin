@@ -41,6 +41,10 @@ public final class MantisProjectProperty extends JobProperty<AbstractProject<?, 
     public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
     private static final String ISSUE_ID_STRING = "%ID%";
     private static final String DEFAULT_PATTERN = "issue #?" + ISSUE_ID_STRING;
+    
+    private static final String VERSION_STRING = "%VERSION%";
+    private static final String DEFAULT_VERSION_PATTERN = "version #?" + VERSION_STRING + "#";
+    
     private final String siteName;
     private final int projectId;
     private final String category;
@@ -48,6 +52,8 @@ public final class MantisProjectProperty extends JobProperty<AbstractProject<?, 
     private final String regex;
     private Pattern regexpPattern;
     private final boolean linkEnabled;
+    private final String versionPattern;
+    private Pattern versionPatternP;
 
     public static MantisProjectProperty get(AbstractBuild<?, ?> build) {
         if (build == null) {
@@ -64,7 +70,7 @@ public final class MantisProjectProperty extends JobProperty<AbstractProject<?, 
     
     @DataBoundConstructor
     public MantisProjectProperty(String siteName, int projectId, String category,
-            String pattern, String regex, boolean linkEnabled) {
+            String pattern, String regex, boolean linkEnabled, String versionPattern) {
         String name;
         if (siteName != null) {
              name = siteName;
@@ -82,6 +88,8 @@ public final class MantisProjectProperty extends JobProperty<AbstractProject<?, 
             this.regexpPattern = createRegexp(this.pattern);
         }
         this.linkEnabled = linkEnabled;
+        this.versionPattern = Util.fixEmptyAndTrim(versionPattern);
+        this.versionPatternP = createVersionRegexp(this.versionPattern);
     }
 
     public String getSiteName() {
@@ -129,6 +137,10 @@ public final class MantisProjectProperty extends JobProperty<AbstractProject<?, 
         }
         return null;
     }
+    
+    public String getVersionPattern() {
+        return versionPattern;
+    }
 
     private String defaultSiteName() {
         final MantisSite[] sites = DESCRIPTOR.getSites();
@@ -148,6 +160,19 @@ public final class MantisProjectProperty extends JobProperty<AbstractProject<?, 
         }
         buf.append(')');
         final String pt = buf.toString().replace(ISSUE_ID_STRING, ")(\\d+)(?=");
+        return Pattern.compile(pt);
+    }
+    
+    private Pattern createVersionRegexp(final String p) {
+        final StringBuffer buf = new StringBuffer();
+        buf.append("(?<=");
+        if (p != null) {
+            buf.append(Utility.escapeRegexp(p));
+        } else {
+            buf.append(DEFAULT_VERSION_PATTERN);
+        }
+        buf.append(')');
+        final String pt = buf.toString().replace(VERSION_STRING, ")(\\[^#]+)(?=");
         return Pattern.compile(pt);
     }
     
@@ -337,6 +362,17 @@ public final class MantisProjectProperty extends JobProperty<AbstractProject<?, 
             final String p = Util.fixEmptyAndTrim(value);
             if (p != null && p.indexOf(ISSUE_ID_STRING) == -1) {
                 return FormValidation.error(Messages.MantisProjectProperty_InvalidPattern(ISSUE_ID_STRING));
+            }
+
+            return FormValidation.ok();
+        }
+        
+         public FormValidation doCheckVersionPattern(@AncestorInPath final AbstractProject<?, ?> project,
+                @QueryParameter final String value) throws IOException, ServletException {
+            project.checkPermission(Job.CONFIGURE);
+            final String p = Util.fixEmptyAndTrim(value);
+            if (p != null && p.indexOf(VERSION_STRING) == -1) {
+                return FormValidation.error(Messages.MantisProjectProperty_InvalidPattern(VERSION_STRING));
             }
 
             return FormValidation.ok();

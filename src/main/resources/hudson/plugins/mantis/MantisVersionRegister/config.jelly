@@ -1,0 +1,20 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    <f:entry title="${%Version: }">
+       <label>
+            <f:radio name="mantis.versioningType" value="new" 
+                 checked="${instance.versioningType==null || instance.threshold=='new'}" />
+        ${%new}
+        </label>
+        <label>
+            <f:radio name="mantis.versioningType" value="renameLatest" 
+                 checked="${instance.versioningType=='renameLatest'}" />
+        ${%rename latest}
+        </label>
+    </f:entry>     
+    <f:entry title="" field="obsoletePrev">
+        <label>
+            <f:checkbox />${%Mark previous released version obsolete}
+        </label>
+    </f:entry>       
+</j:jelly>    

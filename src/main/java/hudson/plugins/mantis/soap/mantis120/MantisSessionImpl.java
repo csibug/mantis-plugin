@@ -6,12 +6,15 @@ import hudson.plugins.mantis.model.MantisCategory;
 import hudson.plugins.mantis.model.MantisIssue;
 import hudson.plugins.mantis.model.MantisNote;
 import hudson.plugins.mantis.model.MantisProject;
+import hudson.plugins.mantis.model.MantisProjectVersion;
 import hudson.plugins.mantis.soap.AbstractMantisSession;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.xml.rpc.ServiceException;
@@ -164,4 +167,57 @@ public final class MantisSessionImpl extends AbstractMantisSession {
     }
 
     private static final Logger LOGGER = Logger.getLogger(MantisSessionImpl.class.getName());
+    
+    public List<MantisProjectVersion> getProjectVersions(BigInteger projectId) throws MantisHandlingException {
+        if (projectId == null) {
+            throw new MantisHandlingException("projectId should not be null.");
+        }
+        ProjectVersionData[] mc_project_get_versions;
+        List<MantisProjectVersion> result = new ArrayList<MantisProjectVersion>();
+        try {
+            mc_project_get_versions = portType.mc_project_get_versions(site.getUserName(), site.getPlainPassword(), projectId);
+        } catch (RemoteException ex) {
+             throw new MantisHandlingException(ex);
+        }
+        return result;
+    }
+    
+    public MantisProjectVersion addProjectVersion(MantisProjectVersion version) throws MantisHandlingException {
+        if (version == null && version.getVersion() != null) {
+            throw new MantisHandlingException("version should not be null.");
+        }
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(version.getDateOrder());
+        ProjectVersionData vdata = new ProjectVersionData(null, version.getVersion(), 
+                version.getProjectId(),cal, version.getDescription(), 
+                version.isReleased(), version.isObsolete());
+        
+        try {
+            BigInteger mc_project_version_add = portType.mc_project_version_add(
+                    site.getUserName(), site.getPlainPassword(), vdata);
+            version.setId(mc_project_version_add);
+        } catch (RemoteException ex) {
+            throw new MantisHandlingException(ex);
+        }
+        return version;
+    }
+    
+    public boolean updateProjectVersion(MantisProjectVersion version) throws MantisHandlingException {
+        if (version == null && version.getId() != null)  {
+            throw new MantisHandlingException("version should not be null.");
+        }
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(version.getDateOrder());
+        ProjectVersionData vdata = new ProjectVersionData(version.getId(), 
+                version.getVersion(), version.getProjectId(), cal, 
+                version.getDescription(),version.isReleased(), version.isObsolete());
+        boolean mc_project_version_update;
+        try {
+            mc_project_version_update = portType.mc_project_version_update(
+                    site.getUserName(), site.getPlainPassword(), version.getId(), vdata);
+        } catch (RemoteException ex) {
+            throw new MantisHandlingException(ex);
+        }
+        return mc_project_version_update;
+    }
 }
