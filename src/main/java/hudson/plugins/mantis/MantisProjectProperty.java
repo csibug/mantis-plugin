@@ -43,7 +43,8 @@ public final class MantisProjectProperty extends JobProperty<AbstractProject<?, 
     private static final String DEFAULT_PATTERN = "issue #?" + ISSUE_ID_STRING;
     
     private static final String VERSION_STRING = "%VERSION%";
-    private static final String DEFAULT_VERSION_PATTERN = "version #?" + VERSION_STRING + "#";
+    
+    private static final String DEFAULT_VERSION_PATTERN = "version #" + VERSION_STRING + "#";
     
     private final String siteName;
     private final int projectId;
@@ -52,7 +53,7 @@ public final class MantisProjectProperty extends JobProperty<AbstractProject<?, 
     private final String regex;
     private Pattern regexpPattern;
     private final boolean linkEnabled;
-    private final String versionPattern;
+    private String versionPattern;
     private Pattern versionPatternP;
 
     public static MantisProjectProperty get(AbstractBuild<?, ?> build) {
@@ -120,6 +121,14 @@ public final class MantisProjectProperty extends JobProperty<AbstractProject<?, 
         }
         return regexpPattern;
     }
+    
+    public Pattern getVersionRegexpPattern() {
+        if (this.versionPatternP != null) {
+            return this.versionPatternP;
+        }
+        return createVersionRegexp(this.versionPattern);
+    }
+    
 
     public boolean isLinkEnabled() {
         return linkEnabled;
@@ -164,15 +173,13 @@ public final class MantisProjectProperty extends JobProperty<AbstractProject<?, 
     }
     
     private Pattern createVersionRegexp(final String p) {
-        final StringBuffer buf = new StringBuffer();
-        buf.append("(?<=");
+        StringBuilder buf = new StringBuilder();
         if (p != null) {
             buf.append(Utility.escapeRegexp(p));
         } else {
             buf.append(DEFAULT_VERSION_PATTERN);
         }
-        buf.append(')');
-        final String pt = buf.toString().replace(VERSION_STRING, ")(\\[^#]+)(?=");
+        String pt = buf.toString().replace(VERSION_STRING, "([^#]+)");
         return Pattern.compile(pt);
     }
     

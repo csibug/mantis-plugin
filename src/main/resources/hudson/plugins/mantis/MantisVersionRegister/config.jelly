@@ -3,7 +3,7 @@
     <f:entry title="${%Version: }">
        <label>
             <f:radio name="mantis.versioningType" value="new" 
-                 checked="${instance.versioningType==null || instance.threshold=='new'}" />
+                 checked="${instance.versioningType==null || instance.versioningType=='new'}" />
         ${%new}
         </label>
         <label>

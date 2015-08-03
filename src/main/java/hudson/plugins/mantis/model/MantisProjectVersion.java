@@ -5,7 +5,6 @@
  */
 package hudson.plugins.mantis.model;
 
-import hudson.plugins.mantis.soap.MantisSession;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Date;
@@ -88,4 +87,11 @@ public class MantisProjectVersion implements Serializable {
     public void setObsolete(boolean obsolete) {
         this.obsolete = obsolete;
     }
+
+    @Override
+    public String toString() {
+        return "MantisProjectVersion{" + "projectId=" + projectId + ", id=" + id + ", version=" + version + ", dateOrder=" + dateOrder + ", description=" + description + ", released=" + released + ", obsolete=" + obsolete + '}';
+    }
+    
+    
 }

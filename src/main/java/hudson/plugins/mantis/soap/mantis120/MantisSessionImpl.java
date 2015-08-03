@@ -174,8 +174,14 @@ public final class MantisSessionImpl extends AbstractMantisSession {
         }
         ProjectVersionData[] mc_project_get_versions;
         List<MantisProjectVersion> result = new ArrayList<MantisProjectVersion>();
+        MantisProjectVersion cur;
         try {
             mc_project_get_versions = portType.mc_project_get_versions(site.getUserName(), site.getPlainPassword(), projectId);
+            for (ProjectVersionData pgv : mc_project_get_versions) {
+                cur = new MantisProjectVersion(projectId,pgv.getId(), pgv.getName(),pgv.getDescription(), pgv.getReleased());
+                cur.setObsolete(pgv.getObsolete());
+                result.add(cur);
+            }
         } catch (RemoteException ex) {
              throw new MantisHandlingException(ex);
         }

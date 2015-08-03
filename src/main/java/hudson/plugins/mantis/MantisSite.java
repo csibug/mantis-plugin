@@ -176,6 +176,25 @@ public final class MantisSite {
         final MantisSession session = createSession();
         return session.addProjectVersion(version);
     }
+    
+    public MantisProjectVersion getLatestProjectVersion(MantisProjectVersion version) throws MantisHandlingException {
+        final MantisSession session = createSession();
+        List<MantisProjectVersion> projectVersions = session.getProjectVersions(version.getProjectId());
+        MantisProjectVersion uv = null;
+        for (MantisProjectVersion projectVersion : projectVersions) {
+            //LOGGER.log(Level.INFO, "projectVersion: " + projectVersion);
+            if (!projectVersion.isReleased() && (
+                    uv == null || !uv.getDateOrder().before(projectVersion.getDateOrder()))) {
+                //LOGGER.log(Level.INFO, "projectVersion found.");
+                uv = projectVersion;
+            }
+        }
+        return uv;
+    }
+    public boolean updateProjectVersion(MantisProjectVersion version) throws MantisHandlingException {
+        final MantisSession session = createSession();
+        return session.updateProjectVersion(version);
+    }
 
     public MantisIssue getIssue(final int id) throws MantisHandlingException {
         final MantisSession session = createSession();
