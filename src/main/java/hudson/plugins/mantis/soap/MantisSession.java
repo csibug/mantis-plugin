@@ -6,7 +6,6 @@ import hudson.plugins.mantis.model.MantisIssue;
 import hudson.plugins.mantis.model.MantisNote;
 import hudson.plugins.mantis.model.MantisProject;
 import hudson.plugins.mantis.model.MantisProjectVersion;
-import hudson.plugins.mantis.soap.mantis120.ProjectVersionData;
 import java.math.BigInteger;
 import java.util.List;
 

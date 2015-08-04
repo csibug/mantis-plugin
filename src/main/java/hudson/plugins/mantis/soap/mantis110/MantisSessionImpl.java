@@ -180,6 +180,7 @@ public final class MantisSessionImpl extends AbstractMantisSession {
             mc_project_get_versions = portType.mc_project_get_versions(site.getUserName(), site.getPlainPassword(), projectId);
             for (ProjectVersionData pgv : mc_project_get_versions) {
                 cur = new MantisProjectVersion(projectId, pgv.getId(), pgv.getName(), pgv.getDescription(), pgv.getReleased());
+                cur.setDateOrder(pgv.getDate_order().getTime());
                 result.add(cur);
             }
         } catch (RemoteException ex) {

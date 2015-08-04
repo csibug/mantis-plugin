@@ -36,15 +36,16 @@ public final class MantisVersionRegister extends Recorder {
     private String versioningType;
     
     private boolean obsoletePrev;
+    private boolean failOnMissingVersion;
     
     public static final String NEW = "new";
-    
     public static final String RENAMELATEST = "renameLatest";
     
     @DataBoundConstructor
-    public MantisVersionRegister(String versioningType, boolean obsoletePrev) {
+    public MantisVersionRegister(String versioningType, boolean obsoletePrev, boolean failOnMissingVersion) {
         this.versioningType = Util.fixEmptyAndTrim(versioningType);
         this.obsoletePrev = obsoletePrev;
+        this.failOnMissingVersion = failOnMissingVersion;
     }
     
     public String getVersioningType() {
@@ -53,6 +54,10 @@ public final class MantisVersionRegister extends Recorder {
 
     public boolean isObsoletePrev() {
         return obsoletePrev;
+    }
+    
+    public boolean isFailOnMissingVersion() {
+        return failOnMissingVersion;
     }
     
     @Override
@@ -65,7 +70,6 @@ public final class MantisVersionRegister extends Recorder {
             throws InterruptedException, IOException {
         
         final PrintStream logger = listener.getLogger();
-
         
         MantisSite site = MantisSite.get(build.getProject());
         if (site == null) {
@@ -76,7 +80,12 @@ public final class MantisVersionRegister extends Recorder {
         
         MantisProjectVersion version = createVersion(build, listener);
         if (version == null) {
-            Utility.log(logger, "skipping generation of mantis version ...");
+            if (this.failOnMissingVersion) {
+                Utility.log(logger, "missing mantis version ...");
+                build.setResult(Result.FAILURE);
+            } else {
+                Utility.log(logger, "missing mantis version skip next steps...");
+            }
             return true;
         }
         
@@ -98,6 +107,18 @@ public final class MantisVersionRegister extends Recorder {
                 boolean resp = site.updateProjectVersion(cv);
                 Utility.log(logger, "update of version " + cv + " done with result: " + resp);
             }
+            
+            if (this.obsoletePrev) {
+                cv = site.getLatestNotObsoleteProjectVersion(cv);
+                if (cv == null) {
+                    Utility.log(logger, "cannot find previous released and not obsolete version.");
+                } else {
+                    cv.setObsolete(true);
+                    boolean resp = site.updateProjectVersion(cv);
+                    Utility.log(logger, "update of version to obsolete " + cv + " done with result: " + resp);
+                }
+            }
+                        
         } catch (MantisHandlingException e) {
             Utility.log(logger, e.toString());
             build.setResult(Result.FAILURE);
@@ -143,7 +164,7 @@ public final class MantisVersionRegister extends Recorder {
             return null;
         }
         return new MantisProjectVersion(BigInteger.valueOf(projectId), null, 
-                findVersionFromSCM, "jenkins version", true);
+                findVersionFromSCM, Messages.MantisVersionRegister_VersionDescription(), true);
     }
     
     @Extension
