@@ -33,10 +33,10 @@ import org.kohsuke.stapler.DataBoundConstructor;
  */
 public final class MantisVersionRegister extends Recorder {
     
-    private String versioningType;
+    private final String versioningType;
     
-    private boolean obsoletePrev;
-    private boolean failOnMissingVersion;
+    private final boolean obsoletePrev;
+    private final boolean failOnMissingVersion;
     
     public static final String NEW = "new";
     public static final String RENAMELATEST = "renameLatest";
@@ -131,13 +131,10 @@ public final class MantisVersionRegister extends Recorder {
     }
     
     private String findVersionFromSCM(final AbstractBuild<?, ?> build, BuildListener listener) {
-        final PrintStream logger = listener.getLogger();
         MantisProjectProperty mpp = MantisProjectProperty.get(build);
         Pattern p = mpp.getVersionRegexpPattern();
         for (final Entry change : build.getChangeSet()) {
             Matcher matcher = p.matcher(change.getMsg());
-            Utility.log(logger, "change msg: " + change.getMsg());
-            Utility.log(logger, "version pattern:  " + p.toString());
             while (matcher.find()) {
                 String version = matcher.group(1);
                 if (version != null && version.length() >0)

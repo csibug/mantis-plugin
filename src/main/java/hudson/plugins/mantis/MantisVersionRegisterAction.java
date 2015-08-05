@@ -10,9 +10,9 @@ import java.math.BigInteger;
  */
 public class MantisVersionRegisterAction implements Action {
 
-    private MantisSite site;
+    private final MantisSite site;
 
-    private BigInteger versionId;
+    private final BigInteger versionId;
 
     public MantisVersionRegisterAction(MantisSite site, BigInteger versionId) {
         this.site = site;
