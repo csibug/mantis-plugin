@@ -6,12 +6,11 @@ import java.math.BigInteger;
 /**
  * Mantis Register Action 
  * 
- * @author Seiji Sogabe
+ * @author csibug
  */
 public class MantisVersionRegisterAction implements Action {
 
     private final MantisSite site;
-
     private final BigInteger versionId;
 
     public MantisVersionRegisterAction(MantisSite site, BigInteger versionId) {

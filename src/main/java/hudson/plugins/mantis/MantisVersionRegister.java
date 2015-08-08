@@ -34,7 +34,6 @@ import org.kohsuke.stapler.DataBoundConstructor;
 public final class MantisVersionRegister extends Recorder {
     
     private final String versioningType;
-    
     private final boolean obsoletePrev;
     private final boolean failOnMissingVersion;
     
@@ -42,7 +41,8 @@ public final class MantisVersionRegister extends Recorder {
     public static final String RENAMELATEST = "renameLatest";
     
     @DataBoundConstructor
-    public MantisVersionRegister(String versioningType, boolean obsoletePrev, boolean failOnMissingVersion) {
+    public MantisVersionRegister(String versioningType, boolean obsoletePrev, 
+            boolean failOnMissingVersion) {
         this.versioningType = Util.fixEmptyAndTrim(versioningType);
         this.obsoletePrev = obsoletePrev;
         this.failOnMissingVersion = failOnMissingVersion;
@@ -81,10 +81,10 @@ public final class MantisVersionRegister extends Recorder {
         MantisProjectVersion version = createVersion(build, listener);
         if (version == null) {
             if (this.failOnMissingVersion) {
-                Utility.log(logger, "missing mantis version ...");
+                Utility.log(logger, "missing mantis version.");
                 build.setResult(Result.FAILURE);
             } else {
-                Utility.log(logger, "missing mantis version skip next steps...");
+                Utility.log(logger, "missing mantis version, skip next steps.");
             }
             return true;
         }
