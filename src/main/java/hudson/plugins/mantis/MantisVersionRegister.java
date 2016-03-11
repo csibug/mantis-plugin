@@ -108,6 +108,8 @@ public final class MantisVersionRegister extends Recorder {
                 Utility.log(logger, "update of version " + cv + " done with result: " + resp);
             }
             
+            build.getActions().add(new MantisVersionRegisterAction(site, cv.getId()));
+            
             if (this.obsoletePrev) {
                 cv = site.getLatestNotObsoleteProjectVersion(cv);
                 if (cv == null) {
@@ -125,7 +127,7 @@ public final class MantisVersionRegister extends Recorder {
             return true;
         }
         
-        build.getActions().add(new MantisVersionRegisterAction(site, cv.getId()));
+        //build.getActions().add(new MantisVersionRegisterAction(site, cv.getId()));
         
         return true;
     }
